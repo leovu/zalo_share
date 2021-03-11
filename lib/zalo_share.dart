@@ -11,7 +11,7 @@ class ZaloShare {
     ZaloLoginResult zaloResult = await ZaloLogin().logIn();
     ApiBaseHelper _helper = ApiBaseHelper();
     Map<String, dynamic> responseAccessToken = await _helper.get(
-        "https://oauth.zaloapp.com/v3/access_token?app_id=$zaloAppId&app_secret=$zaloAppKey&code=$zaloResult.oauthCode");
+        "https://oauth.zaloapp.com/v3/access_token?app_id=$zaloAppId&app_secret=$zaloAppKey&code=${zaloResult.oauthCode}");
     String accessToken = responseAccessToken["access_token"];
     Map<String, dynamic> responsePostFeed = await _helper.post(
         "https://graph.zalo.me/v2.0/me/feed?access_token=$accessToken&message=$message&link=$urlShare");
