@@ -26,11 +26,6 @@ class ZaloSharePlugin: FlutterPlugin, MethodCallHandler, ActivityAware  {
   private lateinit var context: Context
   private lateinit var activity: Activity
   private lateinit var result: MethodChannel.Result
-  private var zaloAppId: String? = null
-  private var zaloAppKey: String? = null
-  private var message: String? = null
-  private var urlShare: String? = null
-  private var oauthCode: String? = null
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     context = flutterPluginBinding.applicationContext
@@ -41,13 +36,6 @@ class ZaloSharePlugin: FlutterPlugin, MethodCallHandler, ActivityAware  {
   override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
     if (call.method == "zalo_share") {
       this.result = result
-      var obj:Map<String,String> = call.arguments()
-      zaloAppId = obj["zaloAppId"]
-      zaloAppKey = obj["zaloAppKey"]
-      message = obj["message"]
-      urlShare = obj["urlShare"]
-      oauthCode = obj["oauthCode"]
-      share()
     } else {
       result.notImplemented()
     }
@@ -70,76 +58,6 @@ class ZaloSharePlugin: FlutterPlugin, MethodCallHandler, ActivityAware  {
   }
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
     channel.setMethodCallHandler(null)
-  }
-
-  private fun share() {
-    if (oauthCode != null) {
-      if(zaloAppId != null && zaloAppKey != null) {
-        getAccessToken(oauthCode!!)
-      }
-      else {
-        result.success("Null zaloAppId & zaloAppKey")
-      }
-    }
-    else {
-      result.success("Null Oauth Code")
-    }
-  }
-
-  private fun callShareApi(accessToken: String) {
-    val mURL = URL("https://graph.zalo.me/v2.0/me/feed?access_token=${accessToken}&message=${message}&link=${urlShare}")
-    with(mURL.openConnection() as HttpURLConnection) {
-      requestMethod = "POST"
-      val wr = OutputStreamWriter(getOutputStream());
-      wr.flush();
-      println("URL : $url")
-      println("Response Code : $responseCode")
-      BufferedReader(InputStreamReader(inputStream)).use {
-        val response = StringBuffer()
-        var inputLine = it.readLine()
-        while (inputLine != null) {
-          response.append(inputLine)
-          inputLine = it.readLine()
-        }
-        val jsonObj = JSONObject(response.substring(response.indexOf("{"), response.lastIndexOf("}") + 1))
-        print(jsonObj)
-        val id:String? = jsonObj["id"] as? String
-        if(id != null) {
-          result.success("Share Successful!")
-        }
-        else {
-          result.success("Share Fail Null Id")
-        }
-      }
-    }
-  }
-
-  private fun  getAccessToken(oauthCode: String) {
-    val mURL = URL("https://oauth.zaloapp.com/v3/access_token?app_id=${zaloAppId}&app_secret=${zaloAppKey}&code=${oauthCode}")
-    with(mURL.openConnection() as HttpURLConnection) {
-      requestMethod = "GET"
-      val wr = OutputStreamWriter(getOutputStream());
-      wr.flush();
-      println("URL : $url")
-      println("Response Code : $responseCode")
-      BufferedReader(InputStreamReader(inputStream)).use {
-        val response = StringBuffer()
-        var inputLine = it.readLine()
-        while (inputLine != null) {
-          response.append(inputLine)
-          inputLine = it.readLine()
-        }
-        val jsonObj = JSONObject(response.substring(response.indexOf("{"), response.lastIndexOf("}") + 1))
-        print(jsonObj)
-        val access_token:String? = jsonObj["access_token"] as? String
-        if(access_token != null) {
-          callShareApi(access_token)
-        }
-        else {
-          result.success("Null Response Access Token")
-        }
-      }
-    }
   }
 
 }

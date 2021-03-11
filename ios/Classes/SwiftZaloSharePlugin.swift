@@ -7,19 +7,10 @@ public class SwiftZaloSharePlugin: NSObject, FlutterPlugin {
     let instance = SwiftZaloSharePlugin()
     registrar.addMethodCallDelegate(instance, channel: channel)
   }
-    
+
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
     if call.method == "zalo_share" {
-            guard let args:[String: Any] = (call.arguments as? [String: Any]) else {
-                result(FlutterError(code: "400", message:  "Bad arguments", details: "iOS could not recognize flutter arguments in method: (start)") )
-                return
-            }
-            let zaloShare = ZaloShare()
-            zaloShare.result = result
-            zaloShare.message = args["message"] as! String
-            zaloShare.urlShare = args["urlShare"] as! String
-            zaloShare.oauthCode = args["oauthCode"] as! String
-            zaloShare.share()
+            result("Method Call!");
         }
         else {
             result(FlutterMethodNotImplemented);
