@@ -1,0 +1,40 @@
+PODS:
+  - Flutter (1.0.0)
+  - shared_preferences (0.0.1):
+    - Flutter
+  - zalo_share (0.0.1):
+    - Flutter
+    - ZaloSDK
+  - ZaloSDK (2.5.1009):
+    - ZaloSDK/Core (= 2.5.1009)
+    - ZaloSDK/Main (= 2.5.1009)
+  - ZaloSDK/Core (2.5.1009)
+  - ZaloSDK/Main (2.5.1009):
+    - ZaloSDK/Core
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
+  - zalo_share (from `.symlinks/plugins/zalo_share/ios`)
+
+SPEC REPOS:
+  trunk:
+    - ZaloSDK
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  shared_preferences:
+    :path: ".symlinks/plugins/shared_preferences/ios"
+  zalo_share:
+    :path: ".symlinks/plugins/zalo_share/ios"
+
+SPEC CHECKSUMS:
+  Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
+  shared_preferences: af6bfa751691cdc24be3045c43ec037377ada40d
+  zalo_share: f1444717fc76300fc614b7ade40212e67f46cf54
+  ZaloSDK: 0da456bf02a77e927bca1501d9df464d61c06d55
+
+PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
+
+COCOAPODS: 1.10.1
