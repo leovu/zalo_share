@@ -15,7 +15,7 @@ class ZaloShare {
     String accessToken = responseAccessToken["access_token"];
     Map<String, dynamic> responsePostFeed = await _helper.post(
         "https://graph.zalo.me/v2.0/me/feed?access_token=$accessToken&message=$message&link=$urlShare");
-    String id = responseAccessToken["id"];
+    String id = responsePostFeed["id"];
     return id;
   }
 }
