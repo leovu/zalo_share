@@ -5,6 +5,37 @@ import CommonCrypto
 import CryptoKit
 import Foundation
 
+
+public class Zalo {
+    public static func application(
+            _ application: UIApplication,
+            open url: URL,
+            sourceApplication: String?,
+            annotation: Any
+        ) -> Bool {
+            return ZDKApplicationDelegate.sharedInstance().application(application,
+                open: url,
+                sourceApplication: sourceApplication,
+                annotation: annotation
+            )
+        }
+
+    @available(iOS 9.0, *)
+    public static func application(
+        _ app: UIApplication,
+        open url: URL?,
+        options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+        return ZDKApplicationDelegate
+            .sharedInstance()
+            .application(app,
+                            open: url as URL?,
+                            sourceApplication: options[UIApplication.OpenURLOptionsKey.sourceApplication] as! String?,
+                            annotation: options[UIApplication.OpenURLOptionsKey.annotation]
+        )
+        return false
+    }
+}
+
 public class SwiftZaloSharePlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
     let channel = FlutterMethodChannel(name: "flutter.io/zalo_share", binaryMessenger: registrar.messenger())
