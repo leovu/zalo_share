@@ -2,43 +2,92 @@ package wao.flutter.application.project.zalo_share
 
 import android.app.Activity
 import android.content.Context
+import android.os.Build
 import androidx.annotation.NonNull
+import androidx.annotation.RequiresApi
+import com.zing.zalo.zalosdk.core.helper.AppInfo.getApplicationHashKey
+import com.zing.zalo.zalosdk.oauth.*
+import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
-import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
-import java.net.HttpURLConnection
-import java.net.URL
-import org.json.JSONObject
+import java.security.MessageDigest
+import java.security.SecureRandom
+import java.util.*
+import java.util.Locale.US
+import kotlin.collections.HashMap
+
 
 /** ZaloSharePlugin */
 class ZaloSharePlugin: FlutterPlugin, MethodCallHandler, ActivityAware  {
-  /// The MethodChannel that will the communication between Flutter and native Android
-  ///
-  /// This local reference serves to register the plugin with the Flutter Engine and unregister it
-  /// when the Flutter Engine is detached from the Activity
-  private lateinit var channel : MethodChannel
-  private lateinit var context: Context
-  private lateinit var activity: Activity
-  private lateinit var result: MethodChannel.Result
+  private var _context: Context? = null
+  private var _activity: Activity? = null
+  private val _mSDk = ZaloSDK.Instance
+  private var _result: MethodChannel.Result? = null
+
+  private var _channel: MethodChannel? = null
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-    context = flutterPluginBinding.applicationContext
-    channel = MethodChannel(flutterPluginBinding.binaryMessenger, "flutter.io/zalo_share")
-    channel.setMethodCallHandler(this)
+    _context = flutterPluginBinding.applicationContext
+    _channel = MethodChannel(flutterPluginBinding.binaryMessenger, "flutter.io/zalo_share")
+    _channel!!.setMethodCallHandler(this)
   }
 
+  @RequiresApi(Build.VERSION_CODES.O)
   override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-    if (call.method == "zalo_share") {
-      this.result = result
+    _result = result
+    if (call.method.equals("init")) {
+      val hashkey = getApplicationHashKey(_context)
+      _result!!.success(hashkey)
+    } else if (call.method.equals("logIn")) {
+      _mSDk.unauthenticate()
+      val listener: OAuthCompleteListener = object : OAuthCompleteListener() {
+        override fun onGetOAuthComplete(response: OauthResponse) {
+          val result: MutableMap<String, Any> = HashMap()
+          result["userId"] = response.getuId()
+          result["oauthCode"] = response.oauthCode
+          result["errorCode"] = response.errorCode
+          result["errorMessage"] = response.errorMessage
+          _result!!.success(result)
+        }
+        fun onAuthenError(errorCode: Int, message: String) {
+          val result: MutableMap<String, Any> = HashMap()
+          result["errorCode"] = errorCode
+          result["errorMessage"] = message
+          _result!!.success(result)
+        }
+      }
+      val codeVerifier = genCodeVerifier()
+      val codeChallenge = codeVerifier?.let { genCodeChallenge(it) }
+      _mSDk.authenticateZaloWithAuthenType(_activity, LoginVia.APP_OR_WEB, codeChallenge, listener)
     } else {
-      result.notImplemented()
+      _result!!.notImplemented()
     }
+  }
+
+  @RequiresApi(Build.VERSION_CODES.O)
+  private fun genCodeVerifier(): String? {
+    val sr = SecureRandom()
+    val code = ByteArray(32)
+    sr.nextBytes(code)
+    return Base64.getUrlEncoder().withoutPadding().encodeToString(code)
+  }
+
+  @RequiresApi(Build.VERSION_CODES.O)
+  private fun genCodeChallenge(codeVerifier: String): String? {
+    var result: String? = null
+    try {
+      val bytes: ByteArray = codeVerifier.toByteArray()
+      val md: MessageDigest = MessageDigest.getInstance("SHA-256")
+      md.update(bytes, 0, bytes.size)
+      val digest: ByteArray = md.digest()
+      result = Base64.getUrlEncoder().withoutPadding().encodeToString(digest)
+    } catch (ex: Exception) {
+      print(ex.message)
+    }
+    return result
   }
 
   override fun onDetachedFromActivity() {
@@ -50,14 +99,14 @@ class ZaloSharePlugin: FlutterPlugin, MethodCallHandler, ActivityAware  {
   }
 
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
-    activity = binding.activity
+    _activity = binding.activity
   }
 
   override fun onDetachedFromActivityForConfigChanges() {
 //     TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
   }
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
-    channel.setMethodCallHandler(null)
+    _channel?.setMethodCallHandler(null)
   }
 
 }

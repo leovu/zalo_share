@@ -10,7 +10,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_zalo_login: ^0.1.9+1
   http: ^0.13.0
   connectivity: ^3.0.2
 
