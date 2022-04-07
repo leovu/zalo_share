@@ -5,11 +5,13 @@ A new flutter plugin project.
 ## Android 
 
 # build.gradle
-dependencies {
-    implementation "me.zalo:sdk-core:+"
-    implementation "me.zalo:sdk-auth:+"
-    implementation "me.zalo:sdk-openapi:+"
-}
+
+    dependencies {
+        implementation "me.zalo:sdk-core:+"
+        implementation "me.zalo:sdk-auth:+"
+        implementation "me.zalo:sdk-openapi:+"
+    }
+    
 # Main Activity
 
     import com.zing.zalo.zalosdk.oauth.ZaloSDK
