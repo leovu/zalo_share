@@ -43,8 +43,10 @@ override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) 
       </activity>
 
 ## iOS 
-
+# App Delegate  
 import zalo_share
+
+
  override func application(
             _ application: UIApplication,
             open url: URL,
@@ -71,5 +73,4 @@ import zalo_share
                                 annotation: options[UIApplication.OpenURLOptionsKey.annotation]
             )
         }
-
-}
+      }
