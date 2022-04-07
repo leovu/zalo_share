@@ -12,20 +12,21 @@ dependencies {
 }
 # Main Activity
 
-import com.zing.zalo.zalosdk.oauth.ZaloSDK
-override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-      ZaloSDK.Instance.onActivityResult(this, requestCode, resultCode, data)
-        if (requestCode == 0) {
-            if (resultCode == Activity.RESULT_OK) {
-                val result = data!!.getStringExtra("result")
-                methodChannelResult.success(result)
-            }
-            else {
-                methodChannelResult.success(null)
+    import com.zing.zalo.zalosdk.oauth.ZaloSDK
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+            super.onActivityResult(requestCode, resultCode, data)
+          ZaloSDK.Instance.onActivityResult(this, requestCode, resultCode, data)
+            if (requestCode == 0) {
+                if (resultCode == Activity.RESULT_OK) {
+                    val result = data!!.getStringExtra("result")
+                    methodChannelResult.success(result)
+                }
+                else {
+                    methodChannelResult.success(null)
+                }
             }
         }
-    }
     
 # Manifest 
  <!-- ZALO -->
